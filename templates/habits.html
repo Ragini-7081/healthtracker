@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habits - HealthTrack</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
+        nav {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        nav .logo { font-size: 1.3rem; font-weight: 700; }
+        nav ul { display: flex; gap: 24px; list-style: none; }
+        nav ul a { color: white; text-decoration: none; opacity: 0.85; }
+        nav ul a.active { opacity: 1; font-weight: 600; }
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        h1 { font-size: 1.8rem; color: #333; margin-bottom: 6px; }
+        p.sub { color: #888; margin-bottom: 24px; }
+        .section {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+        .section h2 { color: #764ba2; margin-bottom: 20px; font-size: 1.1rem; }
+        .form-group { margin-bottom: 16px; }
+        .form-row { display: flex; gap: 16px; }
+        .form-row .form-group { flex: 1; }
+        label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: #555; font-weight: 500; }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: #764ba2; }
+        textarea { resize: vertical; min-height: 70px; }
+        .btn-create {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .btn-create:hover { opacity: 0.9; }
+        .habit-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            border: 1px solid #f0f0f0;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            background: #fafafa;
+        }
+
+        /* ✅ CHECK BUTTON CSS */
+        .check-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: 2px solid #764ba2;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .check-btn.done {
+            background: #764ba2;
+            color: white;
+        }
+
+        .habit-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            background: #f3e5f5;
+            flex-shrink: 0;
+        }
+        .habit-info { flex: 1; }
+        .habit-info h3 { font-size: 0.95rem; color: #333; }
+        .habit-info p { font-size: 0.8rem; color: #888; margin-top: 3px; }
+        .badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        .btn-delete {
+            padding: 6px 12px;
+            background: #fde8e8;
+            color: #c0392b;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .empty { text-align: center; color: #aaa; padding: 30px; }
+        .empty span { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">🏃 HealthTrack</div>
+        <ul>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/habits" class="active">Habits</a></li>
+            <li><a href="/analytics">Analytics</a></li>
+        </ul>
+        <a href="/logout" class="logout" style="padding:6px 16px; background:rgba(255,255,255,0.2); color:white; border-radius:20px; text-decoration:none; font-size:0.85rem;">Logout</a>
+    </nav>
+
+    <div class="container">
+        <h1>My Habits ✅</h1>
+        <p class="sub">Build healthy routines</p>
+
+        <!-- Create Form -->
+        <div class="section">
+            <h2>+ Create New Habit</h2>
+            <form method="POST" action="/habits">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Habit Name</label>
+                        <input type="text" name="name" placeholder="e.g. Morning Run" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select name="category">
+                            <option value="fitness">🏋️ Fitness</option>
+                            <option value="nutrition">🥗 Nutrition</option>
+                            <option value="sleep">😴 Sleep</option>
+                            <option value="mental">🧘 Mental</option>
+                            <option value="hydration">💧 Hydration</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Frequency</label>
+                        <select name="frequency">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Goal</label>
+                        <input type="text" name="goal" placeholder="e.g. 30 minutes">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description (optional)</label>
+                    <textarea name="description" placeholder="Why do you want this habit?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>⏰ Reminder Time (optional)</label>
+                    <input type="time" name="reminder_time" placeholder="Set a daily reminder">
+                </div>
+                <button type="submit" class="btn-create">Create Habit</button>
+            </form>
+        </div>
+
+        <!-- Habits List -->
+        <div class="section">
+            <h2>Your Habits</h2>
+            {% if habits %}
+                {% for h in habits %}
+                <div class="habit-item">
+
+                    <!-- ✅ CHECK BUTTON ADDED HERE -->
+                    <form method="POST" action="/habits/{{ h.id }}/complete" style="display:contents">
+                        <button type="submit" class="check-btn {{ 'done' if h.done_today else '' }}">
+                            {{ '✓' if h.done_today else '' }}
+                        </button>
+                    </form>
+
+                    <div class="habit-icon">
+                        {% if h.category == 'fitness' %}🏋️
+                        {% elif h.category == 'nutrition' %}🥗
+                        {% elif h.category == 'sleep' %}😴
+                        {% elif h.category == 'mental' %}🧘
+                        {% elif h.category == 'hydration' %}💧
+                        {% else %}⭐{% endif %}
+                    </div>
+                    <div class="habit-info">
+                        <h3>{{ h.name }}</h3>
+                        <p>{{ h.goal or h.description or h.category }}</p>
+                        {% if h.reminder_time %}
+                        <p style="color:#764ba2; font-size:0.78rem; margin-top:3px;">⏰ Reminder: {{ h.reminder_time }}</p>
+                        {% endif %}
+                    </div>
+                    <span class="badge">{{ h.frequency }}</span>
+                    <form method="POST" action="/habits/{{ h.id }}/delete">
+                        <button type="submit" class="btn-delete">🗑 Delete</button>
+                    </form>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty">
+                    <span>🌱</span>
+                    <p>No habits yet. Create your first one above!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!confirm('Delete this habit?')) e.preventDefault();
+            });
+        });
+    </script>
+
+    <!-- ⏰ Notification & Reminder System -->
+    <script>
+        // Request notification permission on page load
+        if ("Notification" in window) {
+            if (Notification.permission === "default") {
+                Notification.requestPermission().then(perm => {
+                    if (perm === "granted") {
+                        showToast("✅ Notifications enabled! You'll get habit reminders.", "success");
+                    }
+                });
+            }
+        }
+
+        // Show a toast message
+        function showToast(message, type = "info") {
+            const toast = document.createElement("div");
+            toast.className = "toast toast-" + type;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add("show"), 100);
+            setTimeout(() => {
+                toast.classList.remove("show");
+                setTimeout(() => toast.remove(), 400);
+            }, 3500);
+        }
+
+        // Check reminders every minute
+        function checkReminders() {
+            fetch("/api/reminders")
+                .then(res => res.json())
+                .then(reminders => {
+                    const now = new Date();
+                    const currentTime = now.getHours().toString().padStart(2, "0") + ":" +
+                                        now.getMinutes().toString().padStart(2, "0");
+
+                    reminders.forEach(habit => {
+                        if (habit.time === currentTime) {
+                            const key = "notified_" + habit.id + "_" + currentTime;
+                            if (!sessionStorage.getItem(key)) {
+                                sessionStorage.setItem(key, "1");
+                                // Browser notification
+                                if (Notification.permission === "granted") {
+                                    new Notification("⏰ Habit Reminder", {
+                                        body: "Time to: " + habit.name,
+                                        icon: "https://cdn-icons-png.flaticon.com/512/2936/2936886.png"
+                                    });
+                                }
+                                // In-app toast
+                                showToast("⏰ Reminder: Time to " + habit.name + "!", "reminder");
+                            }
+                        }
+                    });
+                });
+        }
+
+        // Run immediately and then every 30 seconds
+        checkReminders();
+        setInterval(checkReminders, 30000);
+    </script>
+
+    <!-- Toast Styles -->
+    <style>
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            z-index: 9999;
+            max-width: 320px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast-success { background: #4caf50; }
+        .toast-reminder { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .toast-info { background: #2196f3; }
+    </style>
+</body>
+</html>

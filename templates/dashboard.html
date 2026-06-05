@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HealthTrack</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
+
+        nav {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        nav .logo { font-size: 1.3rem; font-weight: 700; }
+        nav ul { display: flex; gap: 24px; list-style: none; }
+        nav ul a { color: white; text-decoration: none; opacity: 0.85; }
+        nav ul a.active { opacity: 1; font-weight: 600; }
+        nav .logout { padding: 6px 16px; background: rgba(255,255,255,0.2); color: white; border-radius: 20px; text-decoration: none; font-size: 0.85rem; }
+
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+
+        .greeting { margin-bottom: 24px; }
+        .greeting h1 { font-size: 1.8rem; color: #333; }
+        .greeting p { color: #888; margin-top: 4px; }
+
+        .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .card .icon { font-size: 2rem; margin-bottom: 10px; }
+        .card .value { font-size: 1.8rem; font-weight: 700; color: #764ba2; }
+        .card .label { font-size: 0.85rem; color: #888; margin-top: 4px; }
+
+        .section {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+        .section h2 { color: #333; margin-bottom: 16px; font-size: 1.1rem; }
+
+        .log-form { display: flex; flex-direction: column; gap: 14px; }
+        .log-item { display: flex; align-items: center; gap: 12px; }
+        .log-item label { width: 120px; font-size: 0.9rem; color: #555; }
+        .log-item input, .log-item select {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .log-item input:focus, .log-item select:focus { border-color: #764ba2; }
+        .log-item span { font-size: 0.8rem; color: #aaa; width: 40px; }
+
+        .btn-save {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: flex-start;
+        }
+        .btn-save:hover { opacity: 0.9; }
+
+        .links { display: flex; gap: 12px; flex-wrap: wrap; }
+        .link-card {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+        .link-card:hover { opacity: 0.9; }
+        .link-card span { display: block; font-size: 1.8rem; margin-bottom: 6px; }
+
+        @media (max-width: 600px) {
+            .cards { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">🏃 HealthTrack</div>
+        <ul>
+            <li><a href="/dashboard" class="active">Dashboard</a></li>
+            <li><a href="/habits">Habits</a></li>
+            <li><a href="/analytics">Analytics</a></li>
+        </ul>
+        <a href="/logout" class="logout">Logout</a>
+    </nav>
+
+    <div class="container">
+        <div class="greeting">
+            <h1>Hello, {{ username }} 👋</h1>
+            <p>Here's your health summary for today</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="cards">
+            <div class="card">
+                <div class="icon">💧</div>
+                <div class="value">{{ water }}L</div>
+                <div class="label">Water Today</div>
+            </div>
+            <div class="card">
+                <div class="icon">😴</div>
+                <div class="value">{{ sleep }}h</div>
+                <div class="label">Sleep Last Night</div>
+            </div>
+            <div class="card">
+                <div class="icon">🏃</div>
+                <div class="value">{{ steps }}</div>
+                <div class="label">Steps Today</div>
+            </div>
+        </div>
+
+        <!-- Quick Log -->
+        <div class="section">
+            <h2>Quick Log</h2>
+            <form method="POST" action="/dashboard" class="log-form">
+                <div class="log-item">
+                    <label>💧 Water</label>
+                    <input type="number" name="water" placeholder="0" step="0.1" min="0">
+                    <span>liters</span>
+                </div>
+                <div class="log-item">
+                    <label>😴 Sleep</label>
+                    <input type="number" name="sleep" placeholder="0" step="0.5" min="0">
+                    <span>hours</span>
+                </div>
+                <div class="log-item">
+                    <label>🏃 Steps</label>
+                    <input type="number" name="steps" placeholder="0" min="0">
+                    <span>steps</span>
+                </div>
+                <div class="log-item">
+                    <label>😊 Mood</label>
+                    <select name="mood">
+                        <option value="">Select mood</option>
+                        <option value="5">😄 Great</option>
+                        <option value="4">🙂 Good</option>
+                        <option value="3">😐 Okay</option>
+                        <option value="2">😕 Low</option>
+                        <option value="1">😞 Bad</option>
+                    </select>
+                    <span></span>
+                </div>
+                <button type="submit" class="btn-save">Save Log</button>
+            </form>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="section">
+            <h2>Quick Links</h2>
+            <div class="links">
+                <a href="/habits" class="link-card"><span>✅</span>My Habits</a>
+                <a href="/analytics" class="link-card"><span>📊</span>Analytics</a>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ⏰ Notification & Reminder System -->
+    <script>
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+
+        function showToast(message, type = "info") {
+            const toast = document.createElement("div");
+            toast.className = "toast toast-" + type;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add("show"), 100);
+            setTimeout(() => {
+                toast.classList.remove("show");
+                setTimeout(() => toast.remove(), 400);
+            }, 3500);
+        }
+
+        function checkReminders() {
+            fetch("/api/reminders")
+                .then(res => res.json())
+                .then(reminders => {
+                    const now = new Date();
+                    const currentTime = now.getHours().toString().padStart(2, "0") + ":" +
+                                        now.getMinutes().toString().padStart(2, "0");
+                    reminders.forEach(habit => {
+                        if (habit.time === currentTime) {
+                            const key = "notified_" + habit.id + "_" + currentTime;
+                            if (!sessionStorage.getItem(key)) {
+                                sessionStorage.setItem(key, "1");
+                                if (Notification.permission === "granted") {
+                                    new Notification("⏰ Habit Reminder", {
+                                        body: "Time to: " + habit.name,
+                                        icon: "https://cdn-icons-png.flaticon.com/512/2936/2936886.png"
+                                    });
+                                }
+                                showToast("⏰ Reminder: Time to " + habit.name + "!", "reminder");
+                            }
+                        }
+                    });
+                });
+        }
+
+        checkReminders();
+        setInterval(checkReminders, 30000);
+    </script>
+
+    <style>
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            z-index: 9999;
+            max-width: 320px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast-success { background: #4caf50; }
+        .toast-reminder { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .toast-info { background: #2196f3; }
+    </style>
+</body>
+</html>
