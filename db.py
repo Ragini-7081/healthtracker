@@ -9,22 +9,17 @@ USE_POSTGRES = DATABASE_URL is not None
 if USE_POSTGRES:
     import psycopg2
     import psycopg2.extras
-    from urllib.parse import urlparse
+    from psycopg2.extensions import parse_dsn
 
 def get_connection():
     if USE_POSTGRES:
-        url = urlparse(DATABASE_URL)
-        conn = psycopg2.connect(
-            host=url.hostname,
-            port=url.port,
-            database=url.path[1:],
-            user=url.username,
-            password=url.password,
-            sslmode="require"
-        )
+        # Render gives postgres:// but psycopg2 needs postgresql://
+        url = DATABASE_URL
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+        conn = psycopg2.connect(url, sslmode="require")
         return conn
     else:
-        import sqlite3
         DB_PATH = os.path.join(os.path.dirname(__file__), "healthtrack.db")
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
@@ -67,12 +62,13 @@ def init_db():
                 FOREIGN KEY (habit_id) REFERENCES habits(id)
             )
         """)
-        # Add reminder_time column if it doesn't exist
+        conn.commit()
+        # Add reminder_time column if it doesn't exist (migration for older DBs)
         try:
             cur.execute("ALTER TABLE habits ADD COLUMN reminder_time TEXT DEFAULT NULL")
+            conn.commit()
         except Exception:
             conn.rollback()
-        conn.commit()
     else:
         # SQLite (local development)
         cur.executescript("""
