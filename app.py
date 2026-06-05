@@ -7,6 +7,10 @@ from db import get_connection, init_db, query, USE_POSTGRES
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "healthtrack-key")
 
+# Always initialize DB — works for both gunicorn (Render) and python app.py (local)
+with app.app_context():
+    init_db()
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -207,7 +211,6 @@ def analytics():
 
 
 if __name__ == "__main__":
-    init_db()
     print("✅ Database ready.")
     import webbrowser, threading
     threading.Timer(1.0, lambda: webbrowser.open("http://127.0.0.1:5000")).start()
