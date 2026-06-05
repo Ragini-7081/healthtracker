@@ -1,12 +1,10 @@
+import os
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
 from db import get_connection, init_db, query, USE_POSTGRES
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "healthtrack-key")
-
-import os
 app.secret_key = os.environ.get("SECRET_KEY", "healthtrack-key")
 
 @app.route("/")
