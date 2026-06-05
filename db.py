@@ -9,10 +9,19 @@ USE_POSTGRES = DATABASE_URL is not None
 if USE_POSTGRES:
     import psycopg2
     import psycopg2.extras
+    from urllib.parse import urlparse
 
 def get_connection():
     if USE_POSTGRES:
-        conn = psycopg2.connect(DATABASE_URL, sslmode="require")
+        url = urlparse(DATABASE_URL)
+        conn = psycopg2.connect(
+            host=url.hostname,
+            port=url.port,
+            database=url.path[1:],
+            user=url.username,
+            password=url.password,
+            sslmode="require"
+        )
         return conn
     else:
         import sqlite3
